@@ -1,16 +1,6 @@
 <template>
   <div>
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-      <h1>Dashboard - Supabase CRUD</h1>
-      <button @click="handleLogout" style="padding: 8px 16px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;">
-        登出
-      </button>
-    </div>
-
-    <!-- 登出消息 -->
-    <div v-if="logoutMessage" :style="{ color: 'green', margin: '10px 0', padding: '10px', background: '#e6ffe6', border: '1px solid #99ff99', borderRadius: '4px' }">
-      {{ logoutMessage }}
-    </div>
+    <h1 style="margin-bottom: 20px;">Dashboard - Supabase CRUD</h1>
     
     <!-- 连接状态 -->
     <div style="margin-bottom: 20px; padding: 10px; background: #f0f0f0; border-radius: 4px;">
@@ -90,18 +80,12 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import { useRouter } from "vue-router";
 import { supabase } from "../lib/supabase";
-import { useAuthStore } from "../stores/auth";
-
-const router = useRouter();
-const authStore = useAuthStore();
 
 const tableName = ref("items");
 const items = ref([]);
 const loading = ref(false);
 const error = ref(null);
-const logoutMessage = ref("");
 
 const formData = ref({
   name: "",
@@ -278,33 +262,6 @@ const formatDate = (dateString) => {
   return new Date(dateString).toLocaleString("zh-TW");
 };
 
-// 處理登出
-const handleLogout = async () => {
-  // 詢問是否確認登出
-  if (!confirm("確定要登出嗎？")) {
-    return;
-  }
-
-  try {
-    // 使用 auth store 的登出方法
-    const success = await authStore.logout();
-
-    if (success) {
-      // 顯示登出成功消息
-      logoutMessage.value = "已登出";
-
-      // 清除登出消息並跳轉到登入頁面
-      setTimeout(() => {
-        router.push("/");
-      }, 1500);
-    } else {
-      error.value = "登出失敗";
-    }
-  } catch (err) {
-    console.error("登出錯誤:", err);
-    error.value = `登出失敗: ${err.message}`;
-  }
-};
 
 // 組件掛載時載入資料
 onMounted(() => {
