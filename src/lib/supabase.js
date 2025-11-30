@@ -18,7 +18,9 @@ if (supabaseUrl && !supabaseUrl.startsWith("http")) {
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
-    persistSession: false,
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true,
   },
 });
 
