@@ -3,6 +3,8 @@ import HelloWorld from "../components/HelloWorld.vue";
 import Dashboard from "../views/Dashboard.vue";
 import Register from "../views/Register.vue";
 import Login from "../views/Login.vue";
+import ForgotPassword from "../views/ForgotPassword.vue";
+import ResetPassword from "../views/ResetPassword.vue";
 import { useAuthStore } from "../stores/auth";
 
 const routes = [
@@ -29,6 +31,17 @@ const routes = [
     name: "Register",
     component: Register,
     meta: { requiresGuest: true },
+  },
+  {
+    path: "/forgot-password",
+    name: "ForgotPassword",
+    component: ForgotPassword,
+    meta: { requiresGuest: true },
+  },
+  {
+    path: "/reset-password",
+    name: "ResetPassword",
+    component: ResetPassword,
   },
   {
     path: "/hello",

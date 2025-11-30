@@ -1,48 +1,32 @@
 <template>
   <div>
-    <h1>登入</h1>
+    <h1>忘記密碼</h1>
 
     <div v-if="message" :style="{ color: messageType === 'error' ? 'red' : 'green', margin: '10px 0', padding: '10px', background: messageType === 'error' ? '#ffe6e6' : '#e6ffe6', border: `1px solid ${messageType === 'error' ? '#ff9999' : '#99ff99'}`, borderRadius: '4px' }">
       {{ message }}
     </div>
 
-    <form @submit.prevent="handleLogin">
+    <form @submit.prevent="handleResetPassword">
       <div>
         <label>電子郵件: </label>
         <input 
           type="email" 
           v-model="formData.email" 
-          placeholder="example@email.com" 
+          placeholder="請輸入您的電子郵件" 
           required 
         />
-      </div>
-
-      <div>
-        <label>密碼: </label>
-        <input 
-          type="password" 
-          v-model="formData.password" 
-          placeholder="請輸入密碼" 
-          required 
-        />
-      </div>
-
-      <div style="margin-top: 10px; text-align: right;">
-        <router-link to="/forgot-password" style="font-size: 14px; color: #007bff; text-decoration: none;">
-          忘記密碼？
-        </router-link>
       </div>
 
       <div>
         <button type="submit" :disabled="loading">
-          {{ loading ? "登入中..." : "登入" }}
+          {{ loading ? "發送中..." : "發送重置密碼郵件" }}
         </button>
         <button type="button" @click="clearForm">清除</button>
       </div>
     </form>
 
     <div style="margin-top: 20px;">
-      <router-link to="/register">還沒有帳號？前往註冊</router-link>
+      <router-link to="/">返回登入</router-link>
     </div>
   </div>
 </template>
@@ -51,14 +35,11 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { supabase } from "../lib/supabase";
-import { useAuthStore } from "../stores/auth";
 
 const router = useRouter();
-const authStore = useAuthStore();
 
 const formData = ref({
   email: "",
-  password: "",
 });
 
 const loading = ref(false);
@@ -69,14 +50,13 @@ const messageType = ref("");
 const clearForm = () => {
   formData.value = {
     email: "",
-    password: "",
   };
   message.value = "";
   messageType.value = "";
 };
 
-// 處理登入
-const handleLogin = async () => {
+// 處理重置密碼
+const handleResetPassword = async () => {
   // 清除之前的訊息
   message.value = "";
   messageType.value = "";
@@ -97,27 +77,21 @@ const handleLogin = async () => {
     return;
   }
 
-  if (!formData.value.password) {
-    message.value = "請輸入密碼";
-    messageType.value = "error";
-    return;
-  }
-
   loading.value = true;
 
   try {
     // 清理邮箱地址（去除前后空格）
     const email = trimmedEmail.toLowerCase();
     
-    console.log("嘗試登入，郵箱:", email);
+    console.log("嘗試發送重置密碼郵件，郵箱:", email);
     
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: email,
-      password: formData.value.password,
+    // 發送重置密碼郵件
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
     });
 
     if (error) {
-      console.error("Supabase 登入錯誤:", error);
+      console.error("發送重置密碼郵件錯誤:", error);
       console.error("錯誤詳情:", {
         message: error.message,
         status: error.status,
@@ -126,48 +100,40 @@ const handleLogin = async () => {
       throw error;
     }
 
-    console.log("登入響應:", data);
+    console.log("重置密碼郵件發送成功");
 
-    if (data.user && data.session) {
-      // 保存 session 和 token 到 store
-      authStore.setSession(data.session);
-      
-      message.value = "登入成功！正在跳轉...";
-      messageType.value = "success";
-      
-      // 清除表單
-      clearForm();
+    message.value = "重置密碼郵件已發送！請檢查您的電子郵件並按照指示重置密碼。";
+    messageType.value = "success";
+    
+    // 清除表單
+    clearForm();
 
-      // 跳轉到 Dashboard（路由守衛會自動處理）
-      setTimeout(() => {
-        router.push("/dashboard");
-      }, 1000);
-    } else {
-      message.value = "登入失敗：未收到用戶數據";
-      messageType.value = "error";
-    }
+    // 可選：自動跳轉到登入頁面
+    setTimeout(() => {
+      router.push("/");
+    }, 3000);
   } catch (err) {
-    console.error("登入錯誤:", err);
+    console.error("發送重置密碼郵件錯誤:", err);
     console.error("完整錯誤對象:", JSON.stringify(err, null, 2));
     
-    let errorMessage = "登入失敗";
+    let errorMessage = "發送重置密碼郵件失敗";
     
     if (err.message) {
-      if (err.message.includes("Invalid login credentials") || err.message.includes("Invalid credentials")) {
-        errorMessage = "電子郵件或密碼錯誤";
-      } else if (err.message.includes("Email not confirmed")) {
-        errorMessage = "請先確認您的電子郵件地址";
-      } else if (err.message.includes("User not found")) {
-        errorMessage = "找不到此用戶，請先註冊";
-      } else if (err.message.includes("rate limit") || err.message.includes("too many")) {
+      if (err.message.includes("rate limit") || err.message.includes("too many")) {
         errorMessage = "請求過於頻繁，請稍後再試";
+      } else if (err.message.includes("not found") || err.message.includes("does not exist")) {
+        // 為了安全，不告訴用戶郵箱是否存在
+        errorMessage = "如果該郵箱已註冊，重置密碼郵件已發送。請檢查您的電子郵件。";
+        messageType.value = "success";
       } else {
-        errorMessage = `登入失敗: ${err.message}`;
+        errorMessage = `發送失敗: ${err.message}`;
       }
     }
     
     message.value = errorMessage;
-    messageType.value = "error";
+    if (messageType.value !== "success") {
+      messageType.value = "error";
+    }
   } finally {
     loading.value = false;
   }
