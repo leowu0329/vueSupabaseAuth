@@ -7,6 +7,9 @@
       <router-link to="/change-password" style="text-decoration: none; color: #333; font-size: 14px;">
         重設密碼
       </router-link>
+      <router-link to="/profile" style="text-decoration: none; color: #333; font-size: 14px;">
+        修改個人訊息
+      </router-link>
     </div>
     
     <div style="display: flex; align-items: center; gap: 15px;">
