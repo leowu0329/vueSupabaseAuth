@@ -127,9 +127,9 @@ const handleLogin = async () => {
       // 清除表單
       clearForm();
 
-      // 跳轉到首頁
+      // 跳轉到 Dashboard
       setTimeout(() => {
-        router.push("/");
+        router.push("/dashboard");
       }, 1000);
     } else {
       message.value = "登入失敗：未收到用戶數據";

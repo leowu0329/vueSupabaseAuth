@@ -295,7 +295,7 @@ const handleLogout = async () => {
 
     // 清除登出消息並跳轉到登入頁面
     setTimeout(() => {
-      router.push("/login");
+      router.push("/");
     }, 1500);
   } catch (err) {
     console.error("登出錯誤:", err);

@@ -152,7 +152,7 @@ const handleRegister = async () => {
       // 清除表單
       clearForm();
 
-      // 可選：自動跳轉到首頁
+      // 可選：自動跳轉到登入頁面
       setTimeout(() => {
         router.push("/");
       }, 2000);
