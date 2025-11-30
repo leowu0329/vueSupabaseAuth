@@ -92,8 +92,10 @@
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { supabase } from "../lib/supabase";
+import { useAuthStore } from "../stores/auth";
 
 const router = useRouter();
+const authStore = useAuthStore();
 
 const tableName = ref("items");
 const items = ref([]);
@@ -284,19 +286,20 @@ const handleLogout = async () => {
   }
 
   try {
-    const { error } = await supabase.auth.signOut();
+    // 使用 auth store 的登出方法
+    const success = await authStore.logout();
 
-    if (error) {
-      throw error;
+    if (success) {
+      // 顯示登出成功消息
+      logoutMessage.value = "已登出";
+
+      // 清除登出消息並跳轉到登入頁面
+      setTimeout(() => {
+        router.push("/");
+      }, 1500);
+    } else {
+      error.value = "登出失敗";
     }
-
-    // 顯示登出成功消息
-    logoutMessage.value = "已登出";
-
-    // 清除登出消息並跳轉到登入頁面
-    setTimeout(() => {
-      router.push("/");
-    }, 1500);
   } catch (err) {
     console.error("登出錯誤:", err);
     error.value = `登出失敗: ${err.message}`;

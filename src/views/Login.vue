@@ -45,8 +45,10 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { supabase } from "../lib/supabase";
+import { useAuthStore } from "../stores/auth";
 
 const router = useRouter();
+const authStore = useAuthStore();
 
 const formData = ref({
   email: "",
@@ -120,14 +122,17 @@ const handleLogin = async () => {
 
     console.log("登入響應:", data);
 
-    if (data.user) {
+    if (data.user && data.session) {
+      // 保存 session 和 token 到 store
+      authStore.setSession(data.session);
+      
       message.value = "登入成功！正在跳轉...";
       messageType.value = "success";
       
       // 清除表單
       clearForm();
 
-      // 跳轉到 Dashboard
+      // 跳轉到 Dashboard（路由守衛會自動處理）
       setTimeout(() => {
         router.push("/dashboard");
       }, 1000);

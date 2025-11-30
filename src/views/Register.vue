@@ -57,8 +57,10 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { supabase } from "../lib/supabase";
+import { useAuthStore } from "../stores/auth";
 
 const router = useRouter();
+const authStore = useAuthStore();
 
 const formData = ref({
   email: "",
@@ -146,16 +148,32 @@ const handleRegister = async () => {
     console.log("註冊響應:", data);
 
     if (data.user) {
-      message.value = "註冊成功！請檢查您的電子郵件以確認帳號。";
-      messageType.value = "success";
-      
-      // 清除表單
-      clearForm();
+      // 如果有 session（某些情況下註冊後會自動登入），保存到 store
+      if (data.session) {
+        authStore.setSession(data.session);
+        message.value = "註冊成功！正在跳轉...";
+        messageType.value = "success";
+        
+        // 清除表單
+        clearForm();
 
-      // 可選：自動跳轉到登入頁面
-      setTimeout(() => {
-        router.push("/");
-      }, 2000);
+        // 自動跳轉到 Dashboard
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 1000);
+      } else {
+        // 需要確認郵件的情況
+        message.value = "註冊成功！請檢查您的電子郵件以確認帳號。";
+        messageType.value = "success";
+        
+        // 清除表單
+        clearForm();
+
+        // 自動跳轉到登入頁面
+        setTimeout(() => {
+          router.push("/");
+        }, 2000);
+      }
     } else {
       message.value = "註冊失敗：未收到用戶數據";
       messageType.value = "error";
