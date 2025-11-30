@@ -4,6 +4,9 @@
       <router-link to="/dashboard" style="text-decoration: none; color: #333; font-weight: bold; font-size: 18px;">
         Dashboard
       </router-link>
+      <router-link to="/change-password" style="text-decoration: none; color: #333; font-size: 14px;">
+        重設密碼
+      </router-link>
     </div>
     
     <div style="display: flex; align-items: center; gap: 15px;">

@@ -5,6 +5,7 @@ import Register from "../views/Register.vue";
 import Login from "../views/Login.vue";
 import ForgotPassword from "../views/ForgotPassword.vue";
 import ResetPassword from "../views/ResetPassword.vue";
+import ChangePassword from "../views/ChangePassword.vue";
 import { useAuthStore } from "../stores/auth";
 
 const routes = [
@@ -42,6 +43,12 @@ const routes = [
     path: "/reset-password",
     name: "ResetPassword",
     component: ResetPassword,
+  },
+  {
+    path: "/change-password",
+    name: "ChangePassword",
+    component: ChangePassword,
+    meta: { requiresAuth: true },
   },
   {
     path: "/hello",
