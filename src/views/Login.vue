@@ -1,12 +1,12 @@
 <template>
   <div>
-    <h1>註冊</h1>
+    <h1>登入</h1>
 
     <div v-if="message" :style="{ color: messageType === 'error' ? 'red' : 'green', margin: '10px 0', padding: '10px', background: messageType === 'error' ? '#ffe6e6' : '#e6ffe6', border: `1px solid ${messageType === 'error' ? '#ff9999' : '#99ff99'}`, borderRadius: '4px' }">
       {{ message }}
     </div>
 
-    <form @submit.prevent="handleRegister">
+    <form @submit.prevent="handleLogin">
       <div>
         <label>電子郵件: </label>
         <input 
@@ -22,33 +22,21 @@
         <input 
           type="password" 
           v-model="formData.password" 
-          placeholder="至少 6 個字符" 
+          placeholder="請輸入密碼" 
           required 
-          minlength="6"
-        />
-      </div>
-
-      <div>
-        <label>確認密碼: </label>
-        <input 
-          type="password" 
-          v-model="formData.confirmPassword" 
-          placeholder="再次輸入密碼" 
-          required 
-          minlength="6"
         />
       </div>
 
       <div>
         <button type="submit" :disabled="loading">
-          {{ loading ? "註冊中..." : "註冊" }}
+          {{ loading ? "登入中..." : "登入" }}
         </button>
         <button type="button" @click="clearForm">清除</button>
       </div>
     </form>
 
     <div style="margin-top: 20px;">
-      <router-link to="/login">已有帳號？前往登入</router-link>
+      <router-link to="/register">還沒有帳號？前往註冊</router-link>
     </div>
   </div>
 </template>
@@ -63,7 +51,6 @@ const router = useRouter();
 const formData = ref({
   email: "",
   password: "",
-  confirmPassword: "",
 });
 
 const loading = ref(false);
@@ -75,14 +62,13 @@ const clearForm = () => {
   formData.value = {
     email: "",
     password: "",
-    confirmPassword: "",
   };
   message.value = "";
   messageType.value = "";
 };
 
-// 處理註冊
-const handleRegister = async () => {
+// 處理登入
+const handleLogin = async () => {
   // 清除之前的訊息
   message.value = "";
   messageType.value = "";
@@ -103,16 +89,8 @@ const handleRegister = async () => {
     return;
   }
 
-  // 驗證密碼
-  if (formData.value.password !== formData.value.confirmPassword) {
-    message.value = "密碼與確認密碼不一致";
-    messageType.value = "error";
-    return;
-  }
-
-  // 驗證密碼長度
-  if (formData.value.password.length < 6) {
-    message.value = "密碼長度至少需要 6 個字符";
+  if (!formData.value.password) {
+    message.value = "請輸入密碼";
     messageType.value = "error";
     return;
   }
@@ -121,20 +99,17 @@ const handleRegister = async () => {
 
   try {
     // 清理邮箱地址（去除前后空格）
-    const email = formData.value.email.trim().toLowerCase();
+    const email = trimmedEmail.toLowerCase();
     
-    console.log("嘗試註冊，郵箱:", email);
+    console.log("嘗試登入，郵箱:", email);
     
-    const { data, error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email: email,
       password: formData.value.password,
-      options: {
-        emailRedirectTo: window.location.origin,
-      },
     });
 
     if (error) {
-      console.error("Supabase 註冊錯誤:", error);
+      console.error("Supabase 登入錯誤:", error);
       console.error("錯誤詳情:", {
         message: error.message,
         status: error.status,
@@ -143,40 +118,40 @@ const handleRegister = async () => {
       throw error;
     }
 
-    console.log("註冊響應:", data);
+    console.log("登入響應:", data);
 
     if (data.user) {
-      message.value = "註冊成功！請檢查您的電子郵件以確認帳號。";
+      message.value = "登入成功！正在跳轉...";
       messageType.value = "success";
       
       // 清除表單
       clearForm();
 
-      // 可選：自動跳轉到首頁
+      // 跳轉到首頁
       setTimeout(() => {
         router.push("/");
-      }, 2000);
+      }, 1000);
     } else {
-      message.value = "註冊失敗：未收到用戶數據";
+      message.value = "登入失敗：未收到用戶數據";
       messageType.value = "error";
     }
   } catch (err) {
-    console.error("註冊錯誤:", err);
+    console.error("登入錯誤:", err);
     console.error("完整錯誤對象:", JSON.stringify(err, null, 2));
     
-    let errorMessage = "註冊失敗";
+    let errorMessage = "登入失敗";
     
     if (err.message) {
-      if (err.message.includes("already registered") || err.message.includes("already exists") || err.message.includes("already been registered")) {
-        errorMessage = "此電子郵件已被註冊";
-      } else if (err.message.includes("Invalid email") || err.message.includes("is invalid")) {
-        errorMessage = `電子郵件格式不正確或不被接受。\n\n請檢查：\n1. 郵箱格式是否正確\n2. Supabase 是否允許此郵箱域名\n3. 郵箱是否包含特殊字符\n\n錯誤詳情: ${err.message}`;
-      } else if (err.message.includes("Password")) {
-        errorMessage = "密碼不符合要求";
+      if (err.message.includes("Invalid login credentials") || err.message.includes("Invalid credentials")) {
+        errorMessage = "電子郵件或密碼錯誤";
+      } else if (err.message.includes("Email not confirmed")) {
+        errorMessage = "請先確認您的電子郵件地址";
+      } else if (err.message.includes("User not found")) {
+        errorMessage = "找不到此用戶，請先註冊";
       } else if (err.message.includes("rate limit") || err.message.includes("too many")) {
         errorMessage = "請求過於頻繁，請稍後再試";
       } else {
-        errorMessage = `註冊失敗: ${err.message}`;
+        errorMessage = `登入失敗: ${err.message}`;
       }
     }
     
