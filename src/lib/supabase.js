@@ -3,11 +3,24 @@ import { createClient } from "@supabase/supabase-js";
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
+// 調試信息
+console.log("Supabase URL:", supabaseUrl);
+console.log("Supabase Anon Key:", supabaseAnonKey ? "已設置" : "未設置");
+
 if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error("Missing Supabase environment variables");
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// 驗證 URL 格式
+if (supabaseUrl && !supabaseUrl.startsWith("http")) {
+  console.warn("警告: Supabase URL 格式可能不正確，應以 http:// 或 https:// 開頭");
+}
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: false,
+  },
+});
 
 // 測試連線
 (async () => {
