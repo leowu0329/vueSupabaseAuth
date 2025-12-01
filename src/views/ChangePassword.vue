@@ -40,66 +40,41 @@
             <!-- 表單 -->
             <form @submit.prevent="handleChangePassword" class="mt-4">
               <!-- 原密碼 -->
-              <div class="mb-4">
-                <label for="oldPassword" class="form-label fw-semibold mb-2">
-                  <i class="bi bi-lock me-2"></i>原密碼
-                </label>
-                <input
-                  id="oldPassword"
-                  type="password"
-                  class="form-control form-control-lg"
-                  :class="{
-                    'is-invalid':
-                      messageType === 'error' && formData.oldPassword,
-                  }"
-                  v-model="formData.oldPassword"
-                  placeholder="請輸入原密碼"
-                  required
-                />
-              </div>
+              <PasswordInput
+                v-model="formData.oldPassword"
+                label="原密碼"
+                icon="bi bi-lock"
+                placeholder="請輸入原密碼"
+                input-id="oldPassword"
+                :required="true"
+                :is-invalid="messageType === 'error' && formData.oldPassword"
+              />
 
               <!-- 新密碼 -->
-              <div class="mb-4">
-                <label for="password" class="form-label fw-semibold mb-2">
-                  <i class="bi bi-shield-lock me-2"></i>新密碼
-                </label>
-                <input
-                  id="password"
-                  type="password"
-                  class="form-control form-control-lg"
-                  :class="{
-                    'is-invalid': messageType === 'error' && formData.password,
-                  }"
-                  v-model="formData.password"
-                  placeholder="至少 6 個字符"
-                  required
-                  minlength="6"
-                />
-                <div class="form-text mt-2">密碼長度至少需要 6 個字符</div>
-              </div>
+              <PasswordInput
+                v-model="formData.password"
+                label="新密碼"
+                icon="bi bi-shield-lock"
+                placeholder="至少 6 個字符"
+                input-id="password"
+                :required="true"
+                :minlength="6"
+                :is-invalid="messageType === 'error' && formData.password"
+                help-text="密碼長度至少需要 6 個字符"
+              />
 
               <!-- 確認新密碼 -->
-              <div class="mb-5">
-                <label
-                  for="confirmPassword"
-                  class="form-label fw-semibold mb-2"
-                >
-                  <i class="bi bi-shield-check me-2"></i>確認新密碼
-                </label>
-                <input
-                  id="confirmPassword"
-                  type="password"
-                  class="form-control form-control-lg"
-                  :class="{
-                    'is-invalid':
-                      messageType === 'error' && formData.confirmPassword,
-                  }"
-                  v-model="formData.confirmPassword"
-                  placeholder="再次輸入新密碼"
-                  required
-                  minlength="6"
-                />
-              </div>
+              <PasswordInput
+                v-model="formData.confirmPassword"
+                label="確認新密碼"
+                icon="bi bi-shield-check"
+                placeholder="再次輸入新密碼"
+                input-id="confirmPassword"
+                :required="true"
+                :minlength="6"
+                :is-invalid="messageType === 'error' && formData.confirmPassword"
+                container-class="mb-5"
+              />
 
               <!-- 按鈕 -->
               <div class="d-grid gap-2 mb-3">
@@ -148,6 +123,7 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { supabase } from "../lib/supabase";
 import { useAuthStore } from "../stores/auth";
+import PasswordInput from "../components/PasswordInput.vue";
 
 const router = useRouter();
 const authStore = useAuthStore();

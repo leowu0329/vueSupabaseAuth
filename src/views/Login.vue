@@ -58,29 +58,22 @@
               </div>
 
               <!-- 密碼 -->
-              <div class="mb-3">
-                <label for="password" class="form-label fw-semibold mb-2">
-                  <i class="bi bi-lock me-2"></i>密碼
-                </label>
-                <input
-                  id="password"
-                  type="password"
-                  class="form-control form-control-lg"
-                  :class="{
-                    'is-invalid': messageType === 'error' && formData.password,
-                  }"
-                  v-model="formData.password"
-                  placeholder="請輸入密碼"
-                  required
-                />
-                <div class="text-end mt-2">
-                  <router-link
-                    to="/forgot-password"
-                    class="text-primary fw-semibold text-decoration-none small"
-                  >
-                    忘記密碼？
-                  </router-link>
-                </div>
+              <PasswordInput
+                v-model="formData.password"
+                label="密碼"
+                icon="bi bi-lock"
+                placeholder="請輸入密碼"
+                input-id="password"
+                :required="true"
+                :is-invalid="messageType === 'error' && formData.password"
+              />
+              <div class="text-end mt-2 mb-3">
+                <router-link
+                  to="/forgot-password"
+                  class="text-primary fw-semibold text-decoration-none small"
+                >
+                  忘記密碼？
+                </router-link>
               </div>
 
               <!-- 按鈕 -->
@@ -133,6 +126,7 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { supabase } from "../lib/supabase";
 import { useAuthStore } from "../stores/auth";
+import PasswordInput from "../components/PasswordInput.vue";
 
 const router = useRouter();
 const authStore = useAuthStore();
