@@ -1,28 +1,68 @@
 <template>
-  <nav style="background: #f8f9fa; padding: 15px 20px; border-bottom: 1px solid #dee2e6; display: flex; justify-content: space-between; align-items: center;">
-    <div style="display: flex; align-items: center; gap: 20px;">
-      <router-link to="/dashboard" style="text-decoration: none; color: #333; font-weight: bold; font-size: 18px;">
-        Dashboard
+  <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm fixed-top">
+    <div class="container-fluid">
+      <!-- 品牌/Logo -->
+      <router-link to="/dashboard" class="navbar-brand fw-bold text-primary">
+        <i class="bi bi-speedometer2 me-2"></i>Dashboard
       </router-link>
-      <router-link to="/change-password" style="text-decoration: none; color: #333; font-size: 14px;">
-        重設密碼
-      </router-link>
-      <router-link to="/profile" style="text-decoration: none; color: #333; font-size: 14px;">
-        修改個人訊息
-      </router-link>
-    </div>
-    
-    <div style="display: flex; align-items: center; gap: 15px;">
-      <span v-if="authStore.user" style="color: #666;">
-        {{ authStore.user.email }}
-      </span>
-      <button 
-        v-if="authStore.isAuthenticated"
-        @click="handleLogout" 
-        style="padding: 8px 16px; background: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer;"
+
+      <!-- 響應式切換按鈕 -->
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
       >
-        登出
+        <span class="navbar-toggler-icon"></span>
       </button>
+
+      <!-- 導航內容 -->
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto align-items-center">
+          <!-- 用戶下拉菜單 -->
+          <li class="nav-item dropdown" v-if="authStore.isAuthenticated && authStore.user">
+            <a
+              class="nav-link dropdown-toggle d-flex align-items-center"
+              href="#"
+              id="userDropdown"
+              role="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i class="bi bi-person-circle me-2" style="font-size: 1.25rem"></i>
+              <span class="d-none d-md-inline">{{ authStore.user.email }}</span>
+              <span class="d-md-none">帳號</span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown">
+              <li>
+                <h6 class="dropdown-header">
+                  <i class="bi bi-envelope me-2"></i>{{ authStore.user.email }}
+                </h6>
+              </li>
+              <li><hr class="dropdown-divider" /></li>
+              <li>
+                <router-link to="/change-password" class="dropdown-item">
+                  <i class="bi bi-key me-2"></i>重設密碼
+                </router-link>
+              </li>
+              <li>
+                <router-link to="/profile" class="dropdown-item">
+                  <i class="bi bi-person-gear me-2"></i>修改個人訊息
+                </router-link>
+              </li>
+              <li><hr class="dropdown-divider" /></li>
+              <li>
+                <a class="dropdown-item text-danger" href="#" @click.prevent="handleLogout">
+                  <i class="bi bi-box-arrow-right me-2"></i>登出
+                </a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
     </div>
   </nav>
 </template>
@@ -59,22 +99,112 @@ const handleLogout = async () => {
 </script>
 
 <style scoped>
-nav {
-  position: sticky;
-  top: 0;
-  z-index: 100;
+.navbar {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 0.75rem 1rem;
 }
 
-button:hover {
-  background: #c82333 !important;
+.navbar-brand {
+  color: #007bff !important;
+  font-size: 1.25rem;
+  transition: color 0.2s ease;
 }
 
-router-link {
-  transition: color 0.2s;
+.navbar-brand:hover {
+  color: #0056b3 !important;
 }
 
-router-link:hover {
-  color: #007bff;
+.nav-link {
+  color: #333 !important;
+  font-weight: 500;
+  transition: color 0.2s ease;
+  padding: 0.5rem 1rem !important;
+}
+
+.nav-link:hover {
+  color: #007bff !important;
+}
+
+.dropdown-toggle {
+  cursor: pointer;
+}
+
+.dropdown-menu {
+  border: none;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  border-radius: 0.5rem;
+  margin-top: 0.5rem;
+  min-width: 200px;
+}
+
+.dropdown-item {
+  padding: 0.5rem 1rem;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa;
+}
+
+.dropdown-item.text-danger {
+  color: #dc3545 !important;
+}
+
+.dropdown-item.text-danger:hover {
+  background-color: #f8d7da;
+  color: #721c24 !important;
+}
+
+.dropdown-header {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6c757d;
+  padding: 0.5rem 1rem;
+  margin-bottom: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 250px;
+}
+
+.dropdown-divider {
+  margin: 0.5rem 0;
+}
+
+/* 響應式設計 */
+@media (max-width: 991.98px) {
+  .navbar-collapse {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #dee2e6;
+  }
+
+  .dropdown-menu {
+    position: static !important;
+    float: none;
+    width: 100%;
+    margin-top: 0.5rem;
+    box-shadow: none;
+    border: 1px solid #dee2e6;
+  }
+}
+
+/* 確保下拉菜單在移動端正常顯示 */
+@media (max-width: 991.98px) {
+  .navbar-nav {
+    width: 100%;
+  }
+
+  .nav-item.dropdown {
+    width: 100%;
+  }
+
+  .dropdown-toggle {
+    width: 100%;
+    text-align: left;
+  }
 }
 </style>
 
