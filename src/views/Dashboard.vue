@@ -1,81 +1,196 @@
 <template>
   <div class="page-container">
-    <div class="container-fluid py-4">
-      <h1 class="mb-4">Dashboard - Supabase CRUD</h1>
-    
-    <!-- 连接状态 -->
-    <div style="margin-bottom: 20px; padding: 10px; background: #f0f0f0; border-radius: 4px;">
-      <strong>Supabase 連接狀態:</strong> 
-      <span style="color: green;">✓ 已連接</span>
-      <div style="font-size: 12px; color: #666; margin-top: 5px;">
-        提示: 如果查詢失敗，請確認表已創建。在 Supabase Dashboard 的 SQL Editor 中執行 supabase-setup.sql
+    <div class="container-fluid my-4">
+      <!-- 頁面標題 -->
+      <div class="d-flex align-items-center justify-content-between mb-4">
+        <h1 class="h2 fw-bold text-primary mb-0">
+          <i class="bi bi-speedometer2 me-2"></i>Dashboard - Supabase CRUD
+        </h1>
       </div>
-    </div>
-    
-    <!-- 表名输入 -->
-    <div>
-      <label>表名: </label>
-      <input v-model="tableName" placeholder="例如: items" />
-      <button @click="loadData">載入資料</button>
-    </div>
 
-    <!-- 创建表单 -->
-    <div>
-      <h2>新增資料</h2>
-      <div>
-        <label>名稱: </label>
-        <input v-model="formData.name" placeholder="名稱" />
+      <!-- 連接狀態 -->
+      <div class="alert alert-info mb-4" role="alert">
+        <div class="d-flex align-items-center">
+          <i class="bi bi-check-circle-fill text-success me-2" style="font-size: 1.25rem"></i>
+          <div>
+            <strong>Supabase 連接狀態:</strong>
+            <span class="text-success fw-bold ms-2">✓ 已連接</span>
+            <div class="small text-muted mt-1">
+              提示: 如果查詢失敗，請確認表已創建。在 Supabase Dashboard 的 SQL Editor 中執行 supabase-setup.sql
+            </div>
+          </div>
+        </div>
       </div>
-      <div>
-        <label>描述: </label>
-        <input v-model="formData.description" placeholder="描述" />
-      </div>
-      <button @click="createItem">新增</button>
-    </div>
 
-    <!-- 数据列表 -->
-    <div>
-      <h2>資料列表</h2>
-      <div v-if="loading">載入中...</div>
-      <div v-else-if="error" style="color: red; white-space: pre-line; padding: 10px; background: #ffe6e6; border: 1px solid #ff9999; border-radius: 4px;">
-        <strong>錯誤:</strong><br>{{ error }}
+      <!-- 表名輸入 -->
+      <div class="card shadow-sm mb-4">
+        <div class="card-body">
+          <div class="row align-items-end g-3">
+            <div class="col-md-4">
+              <label for="tableNameInput" class="form-label fw-semibold">
+                <i class="bi bi-table me-2"></i>表名:
+              </label>
+              <input
+                id="tableNameInput"
+                v-model="tableName"
+                class="form-control"
+                placeholder="例如: items"
+              />
+            </div>
+            <div class="col-md-auto">
+              <button @click="loadData" class="btn btn-primary" :disabled="loading">
+                <span
+                  v-if="loading"
+                  class="spinner-border spinner-border-sm me-2"
+                  role="status"
+                  aria-hidden="true"
+                ></span>
+                <i v-if="!loading" class="bi bi-arrow-clockwise me-2"></i>載入資料
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
-      <div v-else>
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>名稱</th>
-              <th>描述</th>
-              <th>建立時間</th>
-              <th>操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="item in items" :key="item.id">
-              <td>{{ item.id }}</td>
-              <td>
-                <span v-if="!item.editing">{{ item.name }}</span>
-                <input v-else v-model="item.editName" />
-              </td>
-              <td>
-                <span v-if="!item.editing">{{ item.description }}</span>
-                <input v-else v-model="item.editDescription" />
-              </td>
-              <td>{{ formatDate(item.created_at) }}</td>
-              <td>
-                <button v-if="!item.editing" @click="startEdit(item)">編輯</button>
-                <template v-else>
-                  <button @click="updateItem(item)">儲存</button>
-                  <button @click="cancelEdit(item)">取消</button>
-                </template>
-                <button @click="deleteItem(item.id)">刪除</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+
+      <!-- 創建表單 -->
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white fw-bold">
+          <i class="bi bi-plus-circle me-2"></i>新增資料
+        </div>
+        <div class="card-body">
+          <form @submit.prevent="createItem" class="row g-3">
+            <div class="col-md-6">
+              <label for="newName" class="form-label fw-semibold">
+                <i class="bi bi-tag me-2"></i>名稱:
+              </label>
+              <input
+                id="newName"
+                v-model="formData.name"
+                class="form-control"
+                placeholder="名稱"
+                required
+              />
+            </div>
+            <div class="col-md-6">
+              <label for="newDescription" class="form-label fw-semibold">
+                <i class="bi bi-file-text me-2"></i>描述:
+              </label>
+              <input
+                id="newDescription"
+                v-model="formData.description"
+                class="form-control"
+                placeholder="描述"
+              />
+            </div>
+            <div class="col-12">
+              <button type="submit" class="btn btn-success" :disabled="loading">
+                <span
+                  v-if="loading"
+                  class="spinner-border spinner-border-sm me-2"
+                  role="status"
+                  aria-hidden="true"
+                ></span>
+                <i v-if="!loading" class="bi bi-save me-2"></i>新增
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
+
+      <!-- 資料列表 -->
+      <div class="card shadow-sm">
+        <div class="card-header bg-info text-white fw-bold">
+          <i class="bi bi-list-ul me-2"></i>資料列表
+        </div>
+        <div class="card-body">
+          <!-- 載入中 -->
+          <div v-if="loading" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">載入中...</span>
+            </div>
+            <p class="mt-3 text-muted">載入中...</p>
+          </div>
+
+          <!-- 錯誤訊息 -->
+          <div v-else-if="error" class="alert alert-danger" role="alert">
+            <h4 class="alert-heading">
+              <i class="bi bi-exclamation-triangle-fill me-2"></i>載入資料錯誤!
+            </h4>
+            <p style="white-space: pre-line">{{ error }}</p>
+            <hr />
+            <p class="mb-0">
+              請檢查您的 Supabase 配置、網絡連接，並確保表名 (<code>{{ tableName }}</code>) 正確且已在 Supabase 中創建。
+            </p>
+          </div>
+
+          <!-- 資料表格 -->
+          <div v-else>
+            <div v-if="items.length === 0" class="alert alert-warning text-center" role="alert">
+              <i class="bi bi-inbox me-2"></i>目前沒有資料。請新增一些資料或檢查表名。
+            </div>
+            <div v-else class="table-responsive">
+              <table class="table table-striped table-hover align-middle">
+                <thead class="table-dark">
+                  <tr>
+                    <th>ID</th>
+                    <th>名稱</th>
+                    <th>描述</th>
+                    <th>建立時間</th>
+                    <th class="text-center">操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="item in items" :key="item.id">
+                    <td class="fw-semibold">{{ item.id }}</td>
+                    <td>
+                      <span v-if="!item.editing">{{ item.name }}</span>
+                      <input
+                        v-else
+                        v-model="item.editName"
+                        class="form-control form-control-sm"
+                      />
+                    </td>
+                    <td>
+                      <span v-if="!item.editing">{{ item.description || "-" }}</span>
+                      <input
+                        v-else
+                        v-model="item.editDescription"
+                        class="form-control form-control-sm"
+                      />
+                    </td>
+                    <td class="text-muted small">{{ formatDate(item.created_at) }}</td>
+                    <td>
+                      <div class="d-flex gap-2 justify-content-center">
+                        <button
+                          v-if="!item.editing"
+                          @click="startEdit(item)"
+                          class="btn btn-sm btn-warning"
+                        >
+                          <i class="bi bi-pencil me-1"></i>編輯
+                        </button>
+                        <template v-else>
+                          <button @click="updateItem(item)" class="btn btn-sm btn-success">
+                            <i class="bi bi-check-lg me-1"></i>儲存
+                          </button>
+                          <button @click="cancelEdit(item)" class="btn btn-sm btn-secondary">
+                            <i class="bi bi-x-lg me-1"></i>取消
+                          </button>
+                        </template>
+                        <button
+                          @click="deleteItem(item.id)"
+                          class="btn btn-sm btn-danger"
+                        >
+                          <i class="bi bi-trash me-1"></i>刪除
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -275,40 +390,114 @@ onMounted(() => {
 .page-container {
   width: 100%;
   min-height: calc(100vh - 70px);
+  background-color: #f8f9fa;
 }
 
-.container-fluid {
-  width: 100%;
-  padding-left: 15px;
-  padding-right: 15px;
+.card {
+  border: none;
+  border-radius: 0.5rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
 }
 
-th,
-td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: left;
+.card-header {
+  border-radius: 0.5rem 0.5rem 0 0 !important;
+  border: none;
 }
 
-th {
-  background-color: #f2f2f2;
+.table {
+  margin-bottom: 0;
 }
 
-button {
-  margin: 5px;
-  padding: 5px 10px;
-  cursor: pointer;
+.table thead th {
+  border-bottom: 2px solid #dee2e6;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+  letter-spacing: 0.5px;
 }
 
-input {
-  margin: 5px;
-  padding: 5px;
+.table tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.btn {
+  border-radius: 0.375rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+}
+
+.btn-sm {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+.form-control {
+  border-radius: 0.375rem;
+  border: 1px solid #ced4da;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control:focus {
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.alert {
+  border-radius: 0.5rem;
+  border: none;
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+  .table-responsive {
+    font-size: 0.875rem;
+  }
+
+  .btn-sm {
+    padding: 0.2rem 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  .d-flex.gap-2 {
+    flex-wrap: wrap;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .card-body {
+    padding: 1rem;
+  }
+
+  .table {
+    font-size: 0.75rem;
+  }
+
+  .btn-sm {
+    padding: 0.15rem 0.4rem;
+    font-size: 0.7rem;
+  }
+
+  .btn-sm i {
+    font-size: 0.7rem;
+  }
 }
 </style>
 
