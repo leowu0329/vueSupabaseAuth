@@ -1,80 +1,169 @@
 <template>
-  <div class="page-container">
-    <div class="container-fluid py-4">
-      <div class="row justify-content-center">
-        <div class="col-12 col-md-8 col-lg-6">
-          <h1 class="mb-4">修改個人訊息</h1>
+  <div class="page-container bg-light">
+    <div
+      class="container-fluid d-flex justify-content-center align-items-center min-vh-100 py-4 py-md-5"
+    >
+      <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
+        <div class="card shadow-lg border-0">
+          <div class="card-body">
+            <!-- 標題區域 -->
+            <div class="text-center mb-4">
+              <div class="mb-3">
+                <i
+                  class="bi bi-person-gear text-primary"
+                  style="font-size: 3rem"
+                ></i>
+              </div>
+              <h1 class="h2 fw-bold text-primary mb-2">修改個人訊息</h1>
+              <p class="text-muted">請填寫您的個人資料</p>
+            </div>
 
-    <div v-if="message" :style="{ color: messageType === 'error' ? 'red' : 'green', margin: '10px 0', padding: '10px', background: messageType === 'error' ? '#ffe6e6' : '#e6ffe6', border: `1px solid ${messageType === 'error' ? '#ff9999' : '#99ff99'}`, borderRadius: '4px' }">
-      {{ message }}
-    </div>
+            <!-- 訊息提示 -->
+            <div
+              v-if="message"
+              :class="[
+                'alert',
+                messageType === 'error' ? 'alert-danger' : 'alert-success',
+                'alert-dismissible fade show',
+              ]"
+              role="alert"
+            >
+              <div style="white-space: pre-line">{{ message }}</div>
+              <button
+                type="button"
+                class="btn-close"
+                @click="message = ''"
+                aria-label="Close"
+              ></button>
+            </div>
 
-    <form @submit.prevent="handleSaveProfile">
-      <div>
-        <label>姓名: </label>
-        <input 
-          type="text" 
-          v-model="formData.name" 
-          placeholder="請輸入姓名" 
-        />
-      </div>
+            <!-- 表單 -->
+            <form @submit.prevent="handleSaveProfile" class="mt-4">
+              <!-- 姓名 -->
+              <div class="mb-4">
+                <label for="name" class="form-label fw-semibold mb-2">
+                  <i class="bi bi-person me-2"></i>姓名
+                </label>
+                <input
+                  id="name"
+                  type="text"
+                  class="form-control form-control-lg"
+                  v-model="formData.name"
+                  placeholder="請輸入姓名"
+                />
+              </div>
 
-      <div>
-        <label>手機: </label>
-        <input 
-          type="tel" 
-          v-model="formData.phone" 
-          placeholder="請輸入手機號碼" 
-        />
-      </div>
+              <!-- 手機 -->
+              <div class="mb-4">
+                <label for="phone" class="form-label fw-semibold mb-2">
+                  <i class="bi bi-telephone me-2"></i>手機
+                </label>
+                <input
+                  id="phone"
+                  type="tel"
+                  class="form-control form-control-lg"
+                  v-model="formData.phone"
+                  placeholder="請輸入手機號碼"
+                />
+              </div>
 
-      <div>
-        <label>住址: </label>
-        <input 
-          type="text" 
-          v-model="formData.address" 
-          placeholder="請輸入住址" 
-        />
-      </div>
+              <!-- 住址 -->
+              <div class="mb-4">
+                <label for="address" class="form-label fw-semibold mb-2">
+                  <i class="bi bi-geo-alt me-2"></i>住址
+                </label>
+                <input
+                  id="address"
+                  type="text"
+                  class="form-control form-control-lg"
+                  v-model="formData.address"
+                  placeholder="請輸入住址"
+                />
+              </div>
 
-      <div>
-        <label>生日: </label>
-        <input 
-          type="date" 
-          v-model="formData.birthday" 
-        />
-      </div>
+              <!-- 生日 -->
+              <div class="mb-4">
+                <label for="birthday" class="form-label fw-semibold mb-2">
+                  <i class="bi bi-calendar-event me-2"></i>生日
+                </label>
+                <input
+                  id="birthday"
+                  type="date"
+                  class="form-control form-control-lg"
+                  v-model="formData.birthday"
+                />
+              </div>
 
-      <div>
-        <label>權限: </label>
-        <select v-model="formData.role" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;">
-          <option value="">請選擇權限</option>
-          <option value="管理者">管理者</option>
-          <option value="一般使用者">一般使用者</option>
-          <option value="訪客">訪客</option>
-        </select>
-      </div>
+              <!-- 權限 -->
+              <div class="mb-4">
+                <label for="role" class="form-label fw-semibold mb-2">
+                  <i class="bi bi-shield-check me-2"></i>權限
+                </label>
+                <select
+                  id="role"
+                  class="form-select form-select-lg"
+                  v-model="formData.role"
+                >
+                  <option value="">請選擇權限</option>
+                  <option value="管理者">管理者</option>
+                  <option value="一般使用者">一般使用者</option>
+                  <option value="訪客">訪客</option>
+                </select>
+              </div>
 
-      <div>
-        <label>部門: </label>
-        <select v-model="formData.department" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;">
-          <option value="">請選擇部門</option>
-          <option value="IQC">IQC</option>
-          <option value="IPQC">IPQC</option>
-          <option value="FQC">FQC</option>
-        </select>
-      </div>
+              <!-- 部門 -->
+              <div class="mb-5">
+                <label for="department" class="form-label fw-semibold mb-2">
+                  <i class="bi bi-building me-2"></i>部門
+                </label>
+                <select
+                  id="department"
+                  class="form-select form-select-lg"
+                  v-model="formData.department"
+                >
+                  <option value="">請選擇部門</option>
+                  <option value="IQC">IQC</option>
+                  <option value="IPQC">IPQC</option>
+                  <option value="FQC">FQC</option>
+                </select>
+              </div>
 
-      <div>
-        <button type="submit" :disabled="loading">
-          {{ loading ? "儲存中..." : "儲存" }}
-        </button>
-        <button type="button" @click="loadProfile">重新載入</button>
-      </div>
-    </form>
+              <!-- 按鈕 -->
+              <div class="d-grid gap-2 mb-3">
+                <button
+                  type="submit"
+                  class="btn btn-primary btn-lg"
+                  :disabled="loading"
+                >
+                  <span
+                    v-if="loading"
+                    class="spinner-border spinner-border-sm me-2"
+                    role="status"
+                    aria-hidden="true"
+                  ></span>
+                  <i v-if="!loading" class="bi bi-save me-2"></i>
+                  {{ loading ? "儲存中..." : "儲存" }}
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary"
+                  @click="loadProfile"
+                  :disabled="loading"
+                >
+                  <i class="bi bi-arrow-clockwise me-2"></i>重新載入
+                </button>
+              </div>
+            </form>
 
-          <div class="mt-4">
-            <router-link to="/dashboard">返回 Dashboard</router-link>
+            <!-- 返回連結 -->
+            <div class="text-center mt-4 pt-3 border-top">
+              <router-link
+                to="/dashboard"
+                class="text-primary fw-semibold text-decoration-none"
+              >
+                <i class="bi bi-arrow-left me-2"></i>返回 Dashboard
+              </router-link>
+            </div>
           </div>
         </div>
       </div>
@@ -283,63 +372,133 @@ onMounted(() => {
 <style scoped>
 .page-container {
   width: 100%;
-  min-height: calc(100vh - 70px);
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
-form > div {
-  margin: 15px 0;
+.card {
+  border-radius: 15px;
+  border: none !important;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: bold;
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
 }
 
-input {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  box-sizing: border-box;
-}
-
-select {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  box-sizing: border-box;
+.card-body {
   background: white;
+  padding: 1rem 1rem !important;
+}
+
+.form-label {
+  color: #495057;
+  margin-bottom: 0.5rem;
+}
+
+.form-control-lg,
+.form-select-lg {
+  border-radius: 8px;
+  border: 2px solid #e9ecef;
+  transition: all 0.3s ease;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+.form-control-lg:focus,
+.form-select-lg:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.form-select-lg {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 16px 12px;
+  padding-right: 3rem;
   cursor: pointer;
 }
 
-button {
-  padding: 10px 20px;
-  margin-right: 10px;
-  cursor: pointer;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  background: #007bff;
-  color: white;
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  padding: 12px;
 }
 
-button:disabled {
-  background: #ccc;
-  cursor: not-allowed;
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
 }
 
-button[type="button"] {
-  background: #6c757d;
+.btn-primary:disabled {
+  transform: none;
+  opacity: 0.6;
 }
 
-a {
-  color: #007bff;
-  text-decoration: none;
+.btn-outline-secondary {
+  border-radius: 8px;
+  font-weight: 500;
+  padding: 12px;
 }
 
-a:hover {
-  text-decoration: underline;
+.alert {
+  border-radius: 8px;
+  border: none;
+}
+
+h1 {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* 響應式設計 */
+@media (max-width: 576px) {
+  .card-body {
+    padding: 1.5rem 1.25rem !important;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  .form-control-lg,
+  .form-select-lg {
+    font-size: 1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .form-select-lg {
+    padding-right: 2.5rem;
+  }
+
+  .bi {
+    font-size: 2rem !important;
+  }
+}
+
+/* 動畫效果 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card {
+  animation: fadeIn 0.5s ease;
 }
 </style>
 
