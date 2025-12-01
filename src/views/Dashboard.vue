@@ -1,5 +1,8 @@
 <template>
   <div class="page-container">
+    <!-- 載入中指示器 -->
+    <IsLoading :show="loading" text="載入資料中..." />
+    
     <div class="container-fluid my-4">
       <!-- 頁面標題 -->
       <div class="d-flex align-items-center justify-content-between mb-4">
@@ -198,6 +201,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { supabase } from "../lib/supabase";
+import IsLoading from "../components/IsLoading.vue";
 
 const tableName = ref("items");
 const items = ref([]);
