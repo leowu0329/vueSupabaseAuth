@@ -1,48 +1,54 @@
 <template>
-  <div>
-    <h1>登入</h1>
+  <div class="page-container">
+    <div class="container-fluid d-flex justify-content-center align-items-center min-vh-100">
+      <div class="w-100" style="max-width: 500px;">
+        <h1 class="text-center mb-4">登入</h1>
 
     <div v-if="message" :style="{ color: messageType === 'error' ? 'red' : 'green', margin: '10px 0', padding: '10px', background: messageType === 'error' ? '#ffe6e6' : '#e6ffe6', border: `1px solid ${messageType === 'error' ? '#ff9999' : '#99ff99'}`, borderRadius: '4px' }">
       {{ message }}
     </div>
 
-    <form @submit.prevent="handleLogin">
-      <div>
-        <label>電子郵件: </label>
-        <input 
-          type="email" 
-          v-model="formData.email" 
-          placeholder="example@email.com" 
-          required 
-        />
-      </div>
+        <form @submit.prevent="handleLogin" class="mb-4">
+          <div class="mb-3">
+            <label class="form-label">電子郵件</label>
+            <input 
+              type="email" 
+              class="form-control"
+              v-model="formData.email" 
+              placeholder="example@email.com" 
+              required 
+            />
+          </div>
 
-      <div>
-        <label>密碼: </label>
-        <input 
-          type="password" 
-          v-model="formData.password" 
-          placeholder="請輸入密碼" 
-          required 
-        />
-      </div>
+          <div class="mb-3">
+            <label class="form-label">密碼</label>
+            <input 
+              type="password" 
+              class="form-control"
+              v-model="formData.password" 
+              placeholder="請輸入密碼" 
+              required 
+            />
+          </div>
 
-      <div style="margin-top: 10px; text-align: right;">
-        <router-link to="/forgot-password" style="font-size: 14px; color: #007bff; text-decoration: none;">
-          忘記密碼？
-        </router-link>
-      </div>
+          <div class="mb-3 text-end">
+            <router-link to="/forgot-password" class="text-decoration-none">
+              忘記密碼？
+            </router-link>
+          </div>
 
-      <div>
-        <button type="submit" :disabled="loading">
-          {{ loading ? "登入中..." : "登入" }}
-        </button>
-        <button type="button" @click="clearForm">清除</button>
-      </div>
-    </form>
+          <div class="d-grid gap-2 d-md-flex">
+            <button type="submit" class="btn btn-primary flex-fill" :disabled="loading">
+              {{ loading ? "登入中..." : "登入" }}
+            </button>
+            <button type="button" class="btn btn-secondary" @click="clearForm">清除</button>
+          </div>
+        </form>
 
-    <div style="margin-top: 20px;">
-      <router-link to="/register">還沒有帳號？前往註冊</router-link>
+        <div class="text-center mt-4">
+          <router-link to="/register">還沒有帳號？前往註冊</router-link>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -175,9 +181,9 @@ const handleLogin = async () => {
 </script>
 
 <style scoped>
-form {
-  max-width: 400px;
-  margin: 20px 0;
+.page-container {
+  width: 100%;
+  min-height: 100vh;
 }
 
 form > div {

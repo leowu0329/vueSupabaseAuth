@@ -1,6 +1,8 @@
 <template>
-  <div>
-    <h1>註冊</h1>
+  <div class="page-container">
+    <div class="container-fluid d-flex justify-content-center align-items-center min-vh-100">
+      <div class="w-100" style="max-width: 500px;">
+        <h1 class="text-center mb-4">註冊</h1>
 
     <div v-if="message" :style="{ color: messageType === 'error' ? 'red' : 'green', margin: '10px 0', padding: '10px', background: messageType === 'error' ? '#ffe6e6' : '#e6ffe6', border: `1px solid ${messageType === 'error' ? '#ff9999' : '#99ff99'}`, borderRadius: '4px' }">
       {{ message }}
@@ -47,8 +49,10 @@
       </div>
     </form>
 
-    <div style="margin-top: 20px;">
-      <router-link to="/login">已有帳號？前往登入</router-link>
+        <div class="text-center mt-4">
+          <router-link to="/login">已有帳號？前往登入</router-link>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -207,9 +211,9 @@ const handleRegister = async () => {
 </script>
 
 <style scoped>
-form {
-  max-width: 400px;
-  margin: 20px 0;
+.page-container {
+  width: 100%;
+  min-height: 100vh;
 }
 
 form > div {
