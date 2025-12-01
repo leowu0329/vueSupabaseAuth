@@ -18,24 +18,6 @@
               <p class="text-muted">請輸入您的電子郵件，我們將發送重置密碼連結給您</p>
             </div>
 
-            <!-- 訊息提示 -->
-            <div
-              v-if="message"
-              :class="[
-                'alert',
-                messageType === 'error' ? 'alert-danger' : 'alert-success',
-                'alert-dismissible fade show',
-              ]"
-              role="alert"
-            >
-              <div style="white-space: pre-line">{{ message }}</div>
-              <button
-                type="button"
-                class="btn-close"
-                @click="message = ''"
-                aria-label="Close"
-              ></button>
-            </div>
 
             <!-- 表單 -->
             <form @submit.prevent="handleResetPassword" class="mt-4">
@@ -48,9 +30,6 @@
                   id="email"
                   type="email"
                   class="form-control form-control-lg"
-                  :class="{
-                    'is-invalid': messageType === 'error' && formData.email,
-                  }"
                   v-model="formData.email"
                   placeholder="example@email.com"
                   required
@@ -106,6 +85,7 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { supabase } from "../lib/supabase";
+import { toast } from "vue3-toastify";
 
 const router = useRouter();
 
@@ -114,37 +94,27 @@ const formData = ref({
 });
 
 const loading = ref(false);
-const message = ref("");
-const messageType = ref("");
 
 // 清除表單
 const clearForm = () => {
   formData.value = {
     email: "",
   };
-  message.value = "";
-  messageType.value = "";
 };
 
 // 處理重置密碼
 const handleResetPassword = async () => {
-  // 清除之前的訊息
-  message.value = "";
-  messageType.value = "";
-
   // 驗證郵箱格式
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const trimmedEmail = formData.value.email.trim();
   
   if (!trimmedEmail) {
-    message.value = "請輸入電子郵件";
-    messageType.value = "error";
+    toast.error("請輸入電子郵件");
     return;
   }
   
   if (!emailRegex.test(trimmedEmail)) {
-    message.value = "電子郵件格式不正確";
-    messageType.value = "error";
+    toast.error("電子郵件格式不正確");
     return;
   }
 
@@ -173,8 +143,7 @@ const handleResetPassword = async () => {
 
     console.log("重置密碼郵件發送成功");
 
-    message.value = "重置密碼郵件已發送！請檢查您的電子郵件並按照指示重置密碼。";
-    messageType.value = "success";
+    toast.success("重置密碼郵件已發送！請檢查您的電子郵件並按照指示重置密碼。");
     
     // 清除表單
     clearForm();
@@ -192,18 +161,16 @@ const handleResetPassword = async () => {
     if (err.message) {
       if (err.message.includes("rate limit") || err.message.includes("too many")) {
         errorMessage = "請求過於頻繁，請稍後再試";
-      } else if (err.message.includes("not found") || err.message.includes("does not exist")) {
+      } else       if (err.message.includes("not found") || err.message.includes("does not exist")) {
         // 為了安全，不告訴用戶郵箱是否存在
         errorMessage = "如果該郵箱已註冊，重置密碼郵件已發送。請檢查您的電子郵件。";
-        messageType.value = "success";
+        toast.success(errorMessage);
       } else {
         errorMessage = `發送失敗: ${err.message}`;
+        toast.error(errorMessage);
       }
-    }
-    
-    message.value = errorMessage;
-    if (messageType.value !== "success") {
-      messageType.value = "error";
+    } else {
+      toast.error(errorMessage);
     }
   } finally {
     loading.value = false;

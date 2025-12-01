@@ -18,25 +18,6 @@
               <p class="text-muted mb-0">請填寫以下資訊完成註冊</p>
             </div>
 
-            <!-- 訊息提示 -->
-            <div
-              v-if="message"
-              :class="[
-                'alert',
-                messageType === 'error' ? 'alert-danger' : 'alert-success',
-                'alert-dismissible fade show',
-              ]"
-              role="alert"
-            >
-              <div style="white-space: pre-line">{{ message }}</div>
-              <button
-                type="button"
-                class="btn-close"
-                @click="message = ''"
-                aria-label="Close"
-              ></button>
-            </div>
-
             <!-- 表單 -->
             <form @submit.prevent="handleRegister" class="mt-4">
               <!-- 電子郵件 -->
@@ -48,9 +29,6 @@
                   id="email"
                   type="email"
                   class="form-control form-control-lg"
-                  :class="{
-                    'is-invalid': messageType === 'error' && formData.email,
-                  }"
                   v-model="formData.email"
                   placeholder="example@email.com"
                   required
@@ -67,7 +45,6 @@
                 input-id="password"
                 :required="true"
                 :minlength="6"
-                :is-invalid="messageType === 'error' && formData.password"
                 help-text="密碼長度至少需要 6 個字符"
               />
 
@@ -80,9 +57,6 @@
                 input-id="confirmPassword"
                 :required="true"
                 :minlength="6"
-                :is-invalid="
-                  messageType === 'error' && formData.confirmPassword
-                "
                 container-class="mb-5"
               />
 
@@ -137,6 +111,7 @@ import { useRouter } from "vue-router";
 import { supabase } from "../lib/supabase";
 import { useAuthStore } from "../stores/auth";
 import PasswordInput from "../components/PasswordInput.vue";
+import { toast } from "vue3-toastify";
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -148,8 +123,6 @@ const formData = ref({
 });
 
 const loading = ref(false);
-const message = ref("");
-const messageType = ref("");
 
 // 清除表單
 const clearForm = () => {
@@ -158,43 +131,33 @@ const clearForm = () => {
     password: "",
     confirmPassword: "",
   };
-  message.value = "";
-  messageType.value = "";
 };
 
 // 處理註冊
 const handleRegister = async () => {
-  // 清除之前的訊息
-  message.value = "";
-  messageType.value = "";
-
   // 驗證郵箱格式
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const trimmedEmail = formData.value.email.trim();
 
   if (!trimmedEmail) {
-    message.value = "請輸入電子郵件";
-    messageType.value = "error";
+    toast.error("請輸入電子郵件");
     return;
   }
 
   if (!emailRegex.test(trimmedEmail)) {
-    message.value = "電子郵件格式不正確";
-    messageType.value = "error";
+    toast.error("電子郵件格式不正確");
     return;
   }
 
   // 驗證密碼
   if (formData.value.password !== formData.value.confirmPassword) {
-    message.value = "密碼與確認密碼不一致";
-    messageType.value = "error";
+    toast.error("密碼與確認密碼不一致");
     return;
   }
 
   // 驗證密碼長度
   if (formData.value.password.length < 6) {
-    message.value = "密碼長度至少需要 6 個字符";
-    messageType.value = "error";
+    toast.error("密碼長度至少需要 6 個字符");
     return;
   }
 
@@ -230,8 +193,7 @@ const handleRegister = async () => {
       // 如果有 session（某些情況下註冊後會自動登入），保存到 store
       if (data.session) {
         authStore.setSession(data.session);
-        message.value = "註冊成功！正在跳轉...";
-        messageType.value = "success";
+        toast.success("註冊成功！正在跳轉...");
 
         // 清除表單
         clearForm();
@@ -242,8 +204,7 @@ const handleRegister = async () => {
         }, 1000);
       } else {
         // 需要確認郵件的情況
-        message.value = "註冊成功！請檢查您的電子郵件以確認帳號。";
-        messageType.value = "success";
+        toast.success("註冊成功！請檢查您的電子郵件以確認帳號。");
 
         // 清除表單
         clearForm();
@@ -254,8 +215,7 @@ const handleRegister = async () => {
         }, 2000);
       }
     } else {
-      message.value = "註冊失敗：未收到用戶數據";
-      messageType.value = "error";
+      toast.error("註冊失敗：未收到用戶數據");
     }
   } catch (err) {
     console.error("註冊錯誤:", err);
@@ -287,8 +247,7 @@ const handleRegister = async () => {
       }
     }
 
-    message.value = errorMessage;
-    messageType.value = "error";
+    toast.error(errorMessage);
   } finally {
     loading.value = false;
   }

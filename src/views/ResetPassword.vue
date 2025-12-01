@@ -18,24 +18,6 @@
               <p class="text-muted">請輸入您的新密碼</p>
             </div>
 
-            <!-- 訊息提示 -->
-            <div
-              v-if="message"
-              :class="[
-                'alert',
-                messageType === 'error' ? 'alert-danger' : 'alert-success',
-                'alert-dismissible fade show',
-              ]"
-              role="alert"
-            >
-              <div style="white-space: pre-line">{{ message }}</div>
-              <button
-                type="button"
-                class="btn-close"
-                @click="message = ''"
-                aria-label="Close"
-              ></button>
-            </div>
 
             <!-- 無效 token 提示 -->
             <div v-if="!isValidToken" class="alert alert-warning" role="alert">
@@ -64,7 +46,6 @@
                 input-id="password"
                 :required="true"
                 :minlength="6"
-                :is-invalid="messageType === 'error' && formData.password"
                 help-text="密碼長度至少需要 6 個字符"
               />
 
@@ -77,7 +58,6 @@
                 input-id="confirmPassword"
                 :required="true"
                 :minlength="6"
-                :is-invalid="messageType === 'error' && formData.confirmPassword"
                 container-class="mb-5"
               />
 
@@ -128,6 +108,7 @@ import { ref, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { supabase } from "../lib/supabase";
 import PasswordInput from "../components/PasswordInput.vue";
+import { toast } from "vue3-toastify";
 
 const router = useRouter();
 const route = useRoute();
@@ -138,8 +119,6 @@ const formData = ref({
 });
 
 const loading = ref(false);
-const message = ref("");
-const messageType = ref("");
 const isValidToken = ref(false);
 
 // 清除表單
@@ -148,8 +127,6 @@ const clearForm = () => {
     password: "",
     confirmPassword: "",
   };
-  message.value = "";
-  messageType.value = "";
 };
 
 // 檢查 URL 中的 token
@@ -202,21 +179,15 @@ const checkToken = async () => {
 
 // 處理重置密碼
 const handleResetPassword = async () => {
-  // 清除之前的訊息
-  message.value = "";
-  messageType.value = "";
-
   // 驗證密碼
   if (formData.value.password !== formData.value.confirmPassword) {
-    message.value = "密碼與確認密碼不一致";
-    messageType.value = "error";
+    toast.error("密碼與確認密碼不一致");
     return;
   }
 
   // 驗證密碼長度
   if (formData.value.password.length < 6) {
-    message.value = "密碼長度至少需要 6 個字符";
-    messageType.value = "error";
+    toast.error("密碼長度至少需要 6 個字符");
     return;
   }
 
@@ -242,8 +213,7 @@ const handleResetPassword = async () => {
 
     console.log("密碼重置成功:", data);
 
-    message.value = "密碼重置成功！正在跳轉到登入頁面...";
-    messageType.value = "success";
+    toast.success("密碼重置成功！正在跳轉到登入頁面...");
     
     // 清除表單
     clearForm();
@@ -272,8 +242,7 @@ const handleResetPassword = async () => {
       }
     }
     
-    message.value = errorMessage;
-    messageType.value = "error";
+    toast.error(errorMessage);
   } finally {
     loading.value = false;
   }

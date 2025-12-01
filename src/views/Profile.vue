@@ -18,24 +18,6 @@
               <p class="text-muted">請填寫您的個人資料</p>
             </div>
 
-            <!-- 訊息提示 -->
-            <div
-              v-if="message"
-              :class="[
-                'alert',
-                messageType === 'error' ? 'alert-danger' : 'alert-success',
-                'alert-dismissible fade show',
-              ]"
-              role="alert"
-            >
-              <div style="white-space: pre-line">{{ message }}</div>
-              <button
-                type="button"
-                class="btn-close"
-                @click="message = ''"
-                aria-label="Close"
-              ></button>
-            </div>
 
             <!-- 表單 -->
             <form @submit.prevent="handleSaveProfile" class="mt-4">
@@ -176,6 +158,7 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { supabase } from "../lib/supabase";
 import { useAuthStore } from "../stores/auth";
+import { toast } from "vue3-toastify";
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -190,15 +173,12 @@ const formData = ref({
 });
 
 const loading = ref(false);
-const message = ref("");
-const messageType = ref("");
 
 // 載入個人資料
 const loadProfile = async () => {
   try {
     if (!authStore.user) {
-      message.value = "無法獲取用戶信息";
-      messageType.value = "error";
+      toast.error("無法獲取用戶信息");
       return;
     }
 
@@ -244,17 +224,12 @@ const loadProfile = async () => {
     console.log("個人資料載入成功:", formData.value);
   } catch (err) {
     console.error("載入個人資料錯誤:", err);
-    message.value = "載入個人資料失敗: " + (err.message || "未知錯誤");
-    messageType.value = "error";
+    toast.error("載入個人資料失敗: " + (err.message || "未知錯誤"));
   }
 };
 
 // 處理儲存個人資料
 const handleSaveProfile = async () => {
-  // 清除之前的訊息
-  message.value = "";
-  messageType.value = "";
-
   loading.value = true;
 
   try {
@@ -332,8 +307,7 @@ const handleSaveProfile = async () => {
 
     console.log("個人資料儲存成功:", data);
 
-    message.value = "個人資料更新成功！正在跳轉到 Dashboard...";
-    messageType.value = "success";
+    toast.success("個人資料更新成功！正在跳轉到 Dashboard...");
 
     // 更新 auth store 的 session
     await authStore.checkSession();
@@ -356,8 +330,7 @@ const handleSaveProfile = async () => {
       }
     }
 
-    message.value = errorMessage;
-    messageType.value = "error";
+    toast.error(errorMessage);
   } finally {
     loading.value = false;
   }

@@ -18,24 +18,6 @@
               <p class="text-muted">請輸入您的電子郵件和密碼</p>
             </div>
 
-            <!-- 訊息提示 -->
-            <div
-              v-if="message"
-              :class="[
-                'alert',
-                messageType === 'error' ? 'alert-danger' : 'alert-success',
-                'alert-dismissible fade show',
-              ]"
-              role="alert"
-            >
-              <div style="white-space: pre-line">{{ message }}</div>
-              <button
-                type="button"
-                class="btn-close"
-                @click="message = ''"
-                aria-label="Close"
-              ></button>
-            </div>
 
             <!-- 表單 -->
             <form @submit.prevent="handleLogin" class="mt-4">
@@ -48,9 +30,6 @@
                   id="email"
                   type="email"
                   class="form-control form-control-lg"
-                  :class="{
-                    'is-invalid': messageType === 'error' && formData.email,
-                  }"
                   v-model="formData.email"
                   placeholder="example@email.com"
                   required
@@ -65,7 +44,6 @@
                 placeholder="請輸入密碼"
                 input-id="password"
                 :required="true"
-                :is-invalid="messageType === 'error' && formData.password"
               />
               <div class="text-end mt-2 mb-3">
                 <router-link
@@ -127,6 +105,7 @@ import { useRouter } from "vue-router";
 import { supabase } from "../lib/supabase";
 import { useAuthStore } from "../stores/auth";
 import PasswordInput from "../components/PasswordInput.vue";
+import { toast } from "vue3-toastify";
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -137,8 +116,6 @@ const formData = ref({
 });
 
 const loading = ref(false);
-const message = ref("");
-const messageType = ref("");
 
 // 清除表單
 const clearForm = () => {
@@ -146,35 +123,26 @@ const clearForm = () => {
     email: "",
     password: "",
   };
-  message.value = "";
-  messageType.value = "";
 };
 
 // 處理登入
 const handleLogin = async () => {
-  // 清除之前的訊息
-  message.value = "";
-  messageType.value = "";
-
   // 驗證郵箱格式
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const trimmedEmail = formData.value.email.trim();
   
   if (!trimmedEmail) {
-    message.value = "請輸入電子郵件";
-    messageType.value = "error";
+    toast.error("請輸入電子郵件");
     return;
   }
   
   if (!emailRegex.test(trimmedEmail)) {
-    message.value = "電子郵件格式不正確";
-    messageType.value = "error";
+    toast.error("電子郵件格式不正確");
     return;
   }
 
   if (!formData.value.password) {
-    message.value = "請輸入密碼";
-    messageType.value = "error";
+    toast.error("請輸入密碼");
     return;
   }
 
@@ -207,8 +175,7 @@ const handleLogin = async () => {
       // 保存 session 和 token 到 store
       authStore.setSession(data.session);
       
-      message.value = "登入成功！正在跳轉...";
-      messageType.value = "success";
+      toast.success("登入成功！正在跳轉...");
       
       // 清除表單
       clearForm();
@@ -218,8 +185,7 @@ const handleLogin = async () => {
         router.push("/dashboard");
       }, 1000);
     } else {
-      message.value = "登入失敗：未收到用戶數據";
-      messageType.value = "error";
+      toast.error("登入失敗：未收到用戶數據");
     }
   } catch (err) {
     console.error("登入錯誤:", err);
@@ -241,8 +207,7 @@ const handleLogin = async () => {
       }
     }
     
-    message.value = errorMessage;
-    messageType.value = "error";
+    toast.error(errorMessage);
   } finally {
     loading.value = false;
   }

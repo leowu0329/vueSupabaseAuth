@@ -3,17 +3,33 @@ import { createPinia } from 'pinia'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap/dist/js/bootstrap.bundle.min.js'
 import 'bootstrap-icons/font/bootstrap-icons.css'
+import 'vue3-toastify/dist/index.css'
 import './style.css'
 import App from './App.vue'
 import router from './router'
 import './lib/supabase' // 導入 supabase 以觸發連線測試
 import { useAuthStore } from './stores/auth'
+import Vue3Toastify, { toast } from 'vue3-toastify'
 
 const app = createApp(App)
 const pinia = createPinia()
 
 app.use(pinia)
 app.use(router)
+app.use(Vue3Toastify, {
+  autoClose: 3000,
+  position: 'top-right',
+  transition: 'slide',
+  hideProgressBar: false,
+  closeOnClick: true,
+  pauseOnHover: true,
+  draggable: true,
+  draggablePercent: 0.6,
+  showCloseButtonOnHover: false,
+  closeButton: 'button',
+  icon: true,
+  rtl: false,
+})
 
 // 應用啟動時檢查已保存的 session
 const authStore = useAuthStore();

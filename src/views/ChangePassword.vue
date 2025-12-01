@@ -18,24 +18,6 @@
               <p class="text-muted">請輸入您的原密碼和新密碼</p>
             </div>
 
-            <!-- 訊息提示 -->
-            <div
-              v-if="message"
-              :class="[
-                'alert',
-                messageType === 'error' ? 'alert-danger' : 'alert-success',
-                'alert-dismissible fade show',
-              ]"
-              role="alert"
-            >
-              <div style="white-space: pre-line">{{ message }}</div>
-              <button
-                type="button"
-                class="btn-close"
-                @click="message = ''"
-                aria-label="Close"
-              ></button>
-            </div>
 
             <!-- 表單 -->
             <form @submit.prevent="handleChangePassword" class="mt-4">
@@ -47,7 +29,7 @@
                 placeholder="請輸入原密碼"
                 input-id="oldPassword"
                 :required="true"
-                :is-invalid="messageType === 'error' && formData.oldPassword"
+                :is-invalid="false"
               />
 
               <!-- 新密碼 -->
@@ -59,7 +41,7 @@
                 input-id="password"
                 :required="true"
                 :minlength="6"
-                :is-invalid="messageType === 'error' && formData.password"
+                :is-invalid="false"
                 help-text="密碼長度至少需要 6 個字符"
               />
 
@@ -72,7 +54,7 @@
                 input-id="confirmPassword"
                 :required="true"
                 :minlength="6"
-                :is-invalid="messageType === 'error' && formData.confirmPassword"
+                :is-invalid="false"
                 container-class="mb-5"
               />
 
@@ -124,6 +106,7 @@ import { useRouter } from "vue-router";
 import { supabase } from "../lib/supabase";
 import { useAuthStore } from "../stores/auth";
 import PasswordInput from "../components/PasswordInput.vue";
+import { toast } from "vue3-toastify";
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -135,8 +118,6 @@ const formData = ref({
 });
 
 const loading = ref(false);
-const message = ref("");
-const messageType = ref("");
 
 // 清除表單
 const clearForm = () => {
@@ -145,34 +126,25 @@ const clearForm = () => {
     password: "",
     confirmPassword: "",
   };
-  message.value = "";
-  messageType.value = "";
 };
 
 // 處理更改密碼
 const handleChangePassword = async () => {
-  // 清除之前的訊息
-  message.value = "";
-  messageType.value = "";
-
   // 驗證密碼
   if (formData.value.password !== formData.value.confirmPassword) {
-    message.value = "新密碼與確認密碼不一致";
-    messageType.value = "error";
+    toast.error("新密碼與確認密碼不一致");
     return;
   }
 
   // 驗證密碼長度
   if (formData.value.password.length < 6) {
-    message.value = "新密碼長度至少需要 6 個字符";
-    messageType.value = "error";
+    toast.error("新密碼長度至少需要 6 個字符");
     return;
   }
 
   // 檢查新密碼是否與原密碼相同
   if (formData.value.oldPassword === formData.value.password) {
-    message.value = "新密碼不能與原密碼相同";
-    messageType.value = "error";
+    toast.error("新密碼不能與原密碼相同");
     return;
   }
 
@@ -215,8 +187,7 @@ const handleChangePassword = async () => {
 
     console.log("密碼更新成功:", data);
 
-    message.value = "密碼更新成功！正在跳轉到 Dashboard...";
-    messageType.value = "success";
+    toast.success("密碼更新成功！正在跳轉到 Dashboard...");
     
     // 清除表單
     clearForm();
@@ -244,8 +215,7 @@ const handleChangePassword = async () => {
       }
     }
     
-    message.value = errorMessage;
-    messageType.value = "error";
+    toast.error(errorMessage);
   } finally {
     loading.value = false;
   }
