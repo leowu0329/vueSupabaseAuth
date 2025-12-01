@@ -1,6 +1,9 @@
 <template>
-  <div>
-    <h1>修改個人訊息</h1>
+  <div class="page-container">
+    <div class="container-fluid py-4">
+      <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+          <h1 class="mb-4">修改個人訊息</h1>
 
     <div v-if="message" :style="{ color: messageType === 'error' ? 'red' : 'green', margin: '10px 0', padding: '10px', background: messageType === 'error' ? '#ffe6e6' : '#e6ffe6', border: `1px solid ${messageType === 'error' ? '#ff9999' : '#99ff99'}`, borderRadius: '4px' }">
       {{ message }}
@@ -70,8 +73,11 @@
       </div>
     </form>
 
-    <div style="margin-top: 20px;">
-      <router-link to="/dashboard">返回 Dashboard</router-link>
+          <div class="mt-4">
+            <router-link to="/dashboard">返回 Dashboard</router-link>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -275,9 +281,9 @@ onMounted(() => {
 </script>
 
 <style scoped>
-form {
-  max-width: 400px;
-  margin: 20px 0;
+.page-container {
+  width: 100%;
+  min-height: calc(100vh - 70px);
 }
 
 form > div {

@@ -1,6 +1,7 @@
 <template>
-  <div>
-    <h1 style="margin-bottom: 20px;">Dashboard - Supabase CRUD</h1>
+  <div class="page-container">
+    <div class="container-fluid py-4">
+      <h1 class="mb-4">Dashboard - Supabase CRUD</h1>
     
     <!-- 连接状态 -->
     <div style="margin-bottom: 20px; padding: 10px; background: #f0f0f0; border-radius: 4px;">
@@ -74,6 +75,7 @@
           </tbody>
         </table>
       </div>
+    </div>
     </div>
   </div>
 </template>
@@ -270,6 +272,17 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.page-container {
+  width: 100%;
+  min-height: calc(100vh - 70px);
+}
+
+.container-fluid {
+  width: 100%;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
