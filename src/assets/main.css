@@ -1,0 +1,17 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap');
+
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+/* 自定義樣式 */
+.password-toggle {
+  @apply absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer;
+}
+
+
+.password-toggle svg {
+  @apply h-5 w-5 text-gray-400 hover:text-gray-500;
+}
